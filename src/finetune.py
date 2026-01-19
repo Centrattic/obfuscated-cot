@@ -7,12 +7,16 @@ import json
 import os
 from pathlib import Path
 
+os.environ["TORCHDYNAMO_DISABLE"] = "1"
+
 import torch
 
-torch._dynamo.config.suppress_errors = True
+torch._dynamo.config.disable = True
 
 from datasets import Dataset
-from unsloth import FastLanguageModel, UnslothTrainer, UnslothTrainingArguments
+from transformers import TrainingArguments
+from trl import SFTTrainer
+from unsloth import FastLanguageModel
 
 
 def load_jsonl(file_path: str) -> list[dict]:
@@ -173,7 +177,7 @@ def train(
         learning_rate: Learning rate.
         max_seq_length: Maximum sequence length for training.
     """
-    training_args = UnslothTrainingArguments(
+    training_args = TrainingArguments(
         output_dir=output_dir,
         num_train_epochs=num_epochs,
         per_device_train_batch_size=batch_size,
@@ -190,7 +194,7 @@ def train(
         report_to="none",
     )
 
-    trainer = UnslothTrainer(
+    trainer = SFTTrainer(
         model=model,
         tokenizer=tokenizer,
         train_dataset=dataset,
