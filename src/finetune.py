@@ -7,6 +7,10 @@ import json
 import os
 from pathlib import Path
 
+import torch
+
+torch._dynamo.config.suppress_errors = True
+
 from datasets import Dataset
 from unsloth import FastLanguageModel, UnslothTrainer, UnslothTrainingArguments
 
@@ -138,7 +142,7 @@ def setup_lora(
         lora_dropout=dropout,
         target_modules=target_modules,
         bias="none",
-        use_gradient_checkpointing="unsloth",
+        use_gradient_checkpointing=True,
         random_state=42,
     )
     return model
